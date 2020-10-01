@@ -1,7 +1,8 @@
-package io.github.phantasmdragon.buttonx
+package io.github.phantasmdragon.buttonx.presentation
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import io.github.phantasmdragon.buttonx.R
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
