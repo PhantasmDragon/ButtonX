@@ -1,3 +1,11 @@
 <resources>
+
     <string name="app_name">ButtonX</string>
+
+    <!-- region Main screen -->
+
+    <string name="main_button_text">Messed up?</string>
+
+    <!-- endregion -->
+
 </resources>

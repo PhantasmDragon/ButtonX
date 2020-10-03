@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- region Button -->
+
+    <style name="BaseMaterialButton" parent="Widget.MaterialComponents.Button">
+        <item name="android:paddingStart">@dimen/padding_16dp</item>
+        <item name="android:paddingTop">@dimen/padding_24dp</item>
+        <item name="android:paddingEnd">@dimen/padding_16dp</item>
+        <item name="android:paddingBottom">@dimen/padding_24dp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="strokeColor">@color/dark_purple</item>
+        <item name="strokeWidth">@dimen/stroke_3dp</item>
+        <item name="backgroundTint">@color/pink</item>
+    </style>
+
+    <!-- endregion -->
+
+</resources>
