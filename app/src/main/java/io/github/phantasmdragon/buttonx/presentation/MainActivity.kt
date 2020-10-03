@@ -5,8 +5,13 @@ import android.os.Bundle
 import android.widget.Toast
 import io.github.phantasmdragon.buttonx.R
 import kotlinx.android.synthetic.main.activity_main.*
+import io.github.phantasmdragon.buttonx.data.SharedPreferences
 
 class MainActivity : AppCompatActivity() {
+
+    private val preferences by lazy {
+        SharedPreferences(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
