@@ -5,7 +5,54 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/dark_purple"
     tools:context=".presentation.MainActivity">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/main_guideline_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="@dimen/padding_32dp"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/main_guideline_top"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="104dp"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/main_guideline_end"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_end="@dimen/padding_32dp"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/main_guideline_bottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_end="104dp"/>
+
+    <io.github.phantasmdragon.buttonx.presentation.view.TimeCountView
+        android:id="@+id/main_countdown"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:startDuration="150000"
+        app:layout_constraintStart_toStartOf="@id/main_guideline_start"
+        app:layout_constraintTop_toTopOf="@id/main_guideline_top"
+        app:layout_constraintEnd_toEndOf="@id/main_guideline_end"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/main_button_messed_up"
+        style="@style/BaseMaterialButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/main_button_text"
+        android:textSize="32sp"
+        app:layout_constraintStart_toStartOf="@id/main_guideline_start"
+        app:layout_constraintEnd_toEndOf="@id/main_guideline_end"
+        app:layout_constraintBottom_toBottomOf="@id/main_guideline_bottom" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
