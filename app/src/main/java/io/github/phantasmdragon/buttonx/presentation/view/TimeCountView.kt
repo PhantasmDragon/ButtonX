@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.CountDownTimer
 import android.os.Parcel
 import android.os.Parcelable
+import android.os.SystemClock
 import android.text.format.DateUtils
 import android.util.AttributeSet
 import android.widget.LinearLayout
@@ -21,17 +22,17 @@ class TimeCountView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
-    var startTime: Long = System.currentTimeMillis()
+    var startTime: Long = SystemClock.elapsedRealtime()
         set(value) {
             if (!isRunning) {
                 field = value
             }
         }
     var timeUnit: TimeUnit = TimeUnit.MILLISECONDS
+    var currentTime: Long = startTime
+        private set
 
     private lateinit var countType: CountType
-
-    private var currentTime: Long = startTime
     private var isRunning: Boolean = false
 
     private val stopwatchRunnable = object : Runnable {
@@ -39,7 +40,7 @@ class TimeCountView @JvmOverloads constructor(
             if (isRunning) {
                 currentTime += DateUtils.SECOND_IN_MILLIS
                 updateStopwatchTimeChunks()
-                updateText()
+                updateScreen()
 
                 postDelayed(this, DateUtils.SECOND_IN_MILLIS)
             }
@@ -50,7 +51,7 @@ class TimeCountView @JvmOverloads constructor(
             override fun onTick(millis: Long) {
                 currentTime = millis
                 updateCountDownTimeChunks()
-                updateText()
+                updateScreen()
             }
 
             override fun onFinish() {
@@ -74,7 +75,12 @@ class TimeCountView @JvmOverloads constructor(
 
     init {
         inflate(R.layout.view_time_block_container)
-        init(attrs)
+        initAttributes(attrs)
+    }
+
+    override fun onFinishInflate() {
+        super.onFinishInflate()
+        initializeScreen()
     }
 
     override fun onSaveInstanceState(): Parcelable? {
@@ -128,11 +134,18 @@ class TimeCountView @JvmOverloads constructor(
         }
     }
 
+    fun restart() {
+        when (countType) {
+            CountType.STOPWATCH -> restartStopwatch()
+            CountType.COUNTDOWN -> restartCountDown()
+        }
+    }
+
     fun setListener(countDownListener: CountDownListener?) {
         this.countDownListener = countDownListener
     }
 
-    private fun init(attrs: AttributeSet?) {
+    private fun initAttributes(attrs: AttributeSet?) {
         context.obtainStyledAttributes(attrs, R.styleable.TimeCountView).use { typedArray ->
             val startTime = typedArray.getInt(R.styleable.TimeCountView_start_time, Constant.NO_ID)
                 .takeUnless { it == Constant.NO_ID }
@@ -185,6 +198,23 @@ class TimeCountView @JvmOverloads constructor(
         countDownTimer.cancel()
     }
 
+    private fun restartStopwatch() {
+        stop()
+        initializeScreen()
+
+        with(SystemClock.elapsedRealtime()) {
+            startTime = this
+            currentTime = this
+        }
+
+        start()
+    }
+
+    private fun restartCountDown() {
+        reset()
+        start()
+    }
+
     private fun updateStopwatchTimeChunks() {
         var millisPassed = currentTime - startTime
 
@@ -219,7 +249,14 @@ class TimeCountView @JvmOverloads constructor(
         )
     }
 
-    private fun updateText() {
+    private fun initializeScreen() {
+        view_time_block_seconds.text = INITIAL_FIELD
+        view_time_block_minutes.text = INITIAL_FIELD
+        view_time_block_hours.text = INITIAL_FIELD
+        view_time_block_days.text =INITIAL_FIELD
+    }
+
+    private fun updateScreen() {
         view_time_block_seconds.text = humanReadableTimeChunks[0].withLeadingZero()
         view_time_block_minutes.text = humanReadableTimeChunks[1].withLeadingZero()
         view_time_block_hours.text = humanReadableTimeChunks[2].withLeadingZero()
@@ -257,6 +294,10 @@ class TimeCountView @JvmOverloads constructor(
             }
         }
 
+    }
+
+    private companion object {
+        const val INITIAL_FIELD = "00"
     }
 
     interface CountDownListener {

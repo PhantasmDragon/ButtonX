@@ -2,14 +2,13 @@ package io.github.phantasmdragon.buttonx.presentation
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Toast
 import io.github.phantasmdragon.buttonx.R
 import kotlinx.android.synthetic.main.activity_main.*
 import io.github.phantasmdragon.buttonx.data.SharedPreferences
 
 class MainActivity : AppCompatActivity() {
 
-    private val preferences by lazy {
+    private val preferences by lazy(LazyThreadSafetyMode.NONE) {
         SharedPreferences(this)
     }
 
@@ -19,13 +18,26 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         attachListeners()
+        runStopwatch()
     }
 
     private fun attachListeners() {
         main_button_messed_up.setOnClickListener {
-            Toast.makeText(this, "Messed up", Toast.LENGTH_SHORT).show()
+            onMessedUpClick()
         }
-//        main_countdown.start()
+    }
+
+    private fun runStopwatch() {
+        main_time_count.apply {
+            startTime = preferences.lastClickTime
+            start()
+        }
+    }
+
+    private fun onMessedUpClick() {
+        main_time_count.restart()
+
+        preferences.lastClickTime = main_time_count.startTime
     }
 
 }
