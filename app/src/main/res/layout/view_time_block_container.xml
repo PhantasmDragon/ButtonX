@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/view_time_block_container"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/padding_2dp"
+    android:orientation="horizontal"
+    android:gravity="center"
+    android:background="@drawable/bg_time_block_container">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        style="@style/TimeBlockTextView"
+        android:id="@+id/view_time_block_days"
+        tools:text="04" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        style="@style/TimeBlockTextView"
+        android:id="@+id/view_time_block_hours"
+        tools:text="05" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        style="@style/TimeBlockTextView"
+        android:id="@+id/view_time_block_minutes"
+        tools:text="23" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        style="@style/TimeBlockTextView"
+        android:id="@+id/view_time_block_seconds"
+        tools:text="11" />
+
+</LinearLayout>

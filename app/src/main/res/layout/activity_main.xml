@@ -36,10 +36,11 @@
         app:layout_constraintGuide_end="104dp"/>
 
     <io.github.phantasmdragon.buttonx.presentation.view.TimeCountView
-        android:id="@+id/main_countdown"
-        android:layout_width="0dp"
+        android:id="@+id/main_time_count"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:startDuration="150000"
+        app:start_immediately="true"
+        app:count_type="stopwatch"
         app:layout_constraintStart_toStartOf="@id/main_guideline_start"
         app:layout_constraintTop_toTopOf="@id/main_guideline_top"
         app:layout_constraintEnd_toEndOf="@id/main_guideline_end"/>
@@ -50,7 +51,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="@string/main_button_text"
-        android:textSize="32sp"
+        android:textSize="@dimen/text_32sp"
         app:layout_constraintStart_toStartOf="@id/main_guideline_start"
         app:layout_constraintEnd_toEndOf="@id/main_guideline_end"
         app:layout_constraintBottom_toBottomOf="@id/main_guideline_bottom" />

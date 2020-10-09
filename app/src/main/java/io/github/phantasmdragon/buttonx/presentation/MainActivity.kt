@@ -20,7 +20,7 @@ class MainActivity : AppCompatActivity() {
         main_button_messed_up.setOnClickListener {
             Toast.makeText(this, "Messed up", Toast.LENGTH_SHORT).show()
         }
-        main_countdown.start()
+//        main_countdown.start()
     }
 
 }
