@@ -4,6 +4,7 @@
 
     <!-- region Main screen -->
 
+    <string name="main_message">Vaporwave is dead. So am I</string>
     <string name="main_button_text">Messed up?</string>
 
     <!-- endregion -->
