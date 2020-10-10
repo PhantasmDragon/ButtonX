@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- region Button -->
+
+    <style name="BaseMaterialButton" parent="Widget.MaterialComponents.Button">
+        <item name="android:paddingStart">@dimen/padding_16dp</item>
+        <item name="android:paddingTop">@dimen/padding_24dp</item>
+        <item name="android:paddingEnd">@dimen/padding_16dp</item>
+        <item name="android:paddingBottom">@dimen/padding_24dp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="strokeColor">@color/dark_purple</item>
+        <item name="strokeWidth">@dimen/stroke_4dp</item>
+        <item name="backgroundTint">@color/pink</item>
+    </style>
+
+    <!-- endregion -->
+
+    <!-- region TextView -->
+
+    <style name="TimeBlockTextView" parent="Widget.MaterialComponents.TextView">
+        <item name="android:layout_width">@dimen/view_time_block_width</item>
+        <item name="android:layout_height">@dimen/view_time_block_height</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@drawable/bg_time_block</item>
+        <item name="android:textSize">@dimen/text_38sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <!-- endregion -->
+
+</resources>

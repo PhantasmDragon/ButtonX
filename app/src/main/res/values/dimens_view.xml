@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="view_time_block_width">72dp</dimen>
+    <dimen name="view_time_block_height">91dp</dimen>
+
+</resources>

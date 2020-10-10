@@ -3,9 +3,73 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/dark_purple"
+    tools:background="@color/purple_500"
     tools:context=".presentation.MainActivity">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/main_guideline_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="@dimen/padding_32dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/main_guideline_top"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="104dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/main_guideline_end"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_end="@dimen/padding_32dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/main_guideline_bottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_end="104dp" />
+
+    <io.github.phantasmdragon.buttonx.presentation.view.TimeCountView
+        android:id="@+id/main_time_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:count_type="stopwatch"
+        app:layout_constraintStart_toStartOf="@id/main_guideline_start"
+        app:layout_constraintTop_toTopOf="@id/main_guideline_top"
+        app:layout_constraintEnd_toEndOf="@id/main_guideline_end" />
+
+    <TextView
+        android:id="@+id/main_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:background="@color/pink"
+        android:text="@string/main_message"
+        android:textSize="18sp"
+        android:textColor="@color/white"
+        android:typeface="monospace"
+        app:layout_constraintStart_toStartOf="@id/main_guideline_start"
+        app:layout_constraintTop_toBottomOf="@id/main_time_count"
+        app:layout_constraintEnd_toEndOf="@id/main_guideline_end"
+        app:layout_constraintBottom_toTopOf="@id/main_button_messed_up" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/main_button_messed_up"
+        style="@style/BaseMaterialButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/main_button_text"
+        android:textSize="@dimen/text_32sp"
+        app:layout_constraintStart_toStartOf="@id/main_guideline_start"
+        app:layout_constraintEnd_toEndOf="@id/main_guideline_end"
+        app:layout_constraintBottom_toBottomOf="@id/main_guideline_bottom" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
