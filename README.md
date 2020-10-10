@@ -8,11 +8,11 @@ The first iteration of the project looks like this:
 ![image](https://user-images.githubusercontent.com/20317931/94862970-698af880-0442-11eb-8dd9-6630ad5f4719.png)
 
 ## TODO
-- [ ] Create basic themes & colors (heare are two colors: #33327b and #ff41c4)
-- [ ] Create a shared preferences mechanism for saving values
-- [ ] Build a layout that looks like the one on the screen above
-- [ ] Implement the countdown timer
-- [ ] Connect the shared preferences with the click & the countdown timer (last step)
+- [x] Create basic themes & colors (heare are two colors: #33327b and #ff41c4)
+- [x] Create a shared preferences mechanism for saving values
+- [x] Build a layout that looks like the one on the screen above
+- [x] Implement the countdown timer
+- [x] Connect the shared preferences with the click & the countdown timer (last step)
 
 ## Future
 There are loads of ideas on the app's functionality - for now it does just one thing.
