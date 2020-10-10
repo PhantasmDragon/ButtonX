@@ -8,7 +8,6 @@ import io.github.phantasmdragon.buttonx.data.SharedPreferences
 import io.github.phantasmdragon.buttonx.presentation.view.CheckerboardDrawable
 import kotlinx.android.synthetic.main.activity_main.*
 
-
 class MainActivity : AppCompatActivity() {
 
     private val preferences by lazy(LazyThreadSafetyMode.NONE) {
@@ -46,7 +45,7 @@ class MainActivity : AppCompatActivity() {
     private fun runStopwatch() {
         main_time_count.apply {
             startTime = preferences.lastClickTime
-            start()
+            start(immediately = true)
         }
     }
 

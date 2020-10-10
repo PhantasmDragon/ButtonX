@@ -103,17 +103,17 @@ class TimeCountView @JvmOverloads constructor(
         currentTime = viewState.currentTime
 
         if (viewState.timerRunning) {
-            start()
+            start(immediately = true)
         }
     }
 
-    fun start() {
+    fun start(immediately: Boolean) {
         if (isRunning) return
 
         isRunning = true
 
         when (countType) {
-            CountType.STOPWATCH -> startStopwatch()
+            CountType.STOPWATCH -> startStopwatch(immediately)
             CountType.COUNTDOWN -> startCountDown()
         }
     }
@@ -176,14 +176,17 @@ class TimeCountView @JvmOverloads constructor(
                             currentTime = timeUnit.toMillis(startTime)
                         }
 
-                        start()
+                        start(immediately = false)
                     }
                 }
         }
     }
 
-    private fun startStopwatch() {
-        postDelayed(stopwatchRunnable, DateUtils.SECOND_IN_MILLIS)
+    private fun startStopwatch(immediately: Boolean) {
+        postDelayed(
+            stopwatchRunnable,
+            if (immediately) 0 else DateUtils.SECOND_IN_MILLIS
+        )
     }
 
     private fun stopStopwatch() {
@@ -207,12 +210,12 @@ class TimeCountView @JvmOverloads constructor(
             currentTime = this
         }
 
-        start()
+        start(immediately = false)
     }
 
     private fun restartCountDown() {
         reset()
-        start()
+        start(immediately = false)
     }
 
     private fun updateStopwatchTimeChunks() {
