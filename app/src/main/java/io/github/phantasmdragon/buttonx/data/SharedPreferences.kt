@@ -1,6 +1,7 @@
 package io.github.phantasmdragon.buttonx.data
 
 import android.content.Context
+import android.os.SystemClock
 import androidx.core.content.edit
 
 class SharedPreferences(private val context: Context) {
@@ -10,7 +11,7 @@ class SharedPreferences(private val context: Context) {
     }
 
     var lastClickTime: Long
-        get() = preferences.getLong(KEY_LAST_CLICK_TIME, System.currentTimeMillis())
+        get() = preferences.getLong(KEY_LAST_CLICK_TIME, SystemClock.elapsedRealtime())
         set(value) {
             preferences.edit {
                 putLong(KEY_LAST_CLICK_TIME, value)

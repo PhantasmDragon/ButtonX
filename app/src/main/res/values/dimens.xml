@@ -3,13 +3,24 @@
 
     <!-- region Padding -->
 
+    <dimen name="padding_2dp">2dp</dimen>
     <dimen name="padding_8dp">8dp</dimen>
+    <dimen name="padding_12dp">12dp</dimen>
     <dimen name="padding_16dp">16dp</dimen>
     <dimen name="padding_24dp">24dp</dimen>
     <dimen name="padding_32dp">32dp</dimen>
 
     <!-- endregion -->
 
-    <dimen name="stroke_3dp">3dp</dimen>
+    <!-- region Text -->
+
+    <dimen name="text_23sp">23sp</dimen>
+    <dimen name="text_32sp">32sp</dimen>
+    <dimen name="text_38sp">38sp</dimen>
+
+    <!-- endregion -->
+
+    <dimen name="stroke_2dp">2dp</dimen>
+    <dimen name="stroke_4dp">4dp</dimen>
 
 </resources>

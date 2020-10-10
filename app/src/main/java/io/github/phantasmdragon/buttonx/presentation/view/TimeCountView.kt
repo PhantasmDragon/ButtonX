@@ -1,242 +1,289 @@
 package io.github.phantasmdragon.buttonx.presentation.view
 
 import android.content.Context
-import android.content.res.Resources
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
 import android.os.CountDownTimer
 import android.os.Parcel
 import android.os.Parcelable
-import android.text.*
-import android.text.style.AbsoluteSizeSpan
-import android.text.style.TextAppearanceSpan
+import android.os.SystemClock
+import android.text.format.DateUtils
 import android.util.AttributeSet
-import android.util.TypedValue
-import android.view.View
+import android.widget.LinearLayout
+import androidx.core.content.res.getIntOrThrow
+import androidx.core.content.res.use
 import io.github.phantasmdragon.buttonx.R
-import java.util.*
+import io.github.phantasmdragon.buttonx.presentation.data.Constant
+import io.github.phantasmdragon.buttonx.utils.extension.inflate
+import kotlinx.android.synthetic.main.view_time_block_container.view.*
+import java.util.concurrent.TimeUnit
 
 class TimeCountView @JvmOverloads constructor(
-    context: Context?,
-    attrs: AttributeSet
-) : View(context, attrs) {
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
+) : LinearLayout(context, attrs, defStyleAttr) {
 
-    private val textPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
-
-    private var textAppearanceSpan: TextAppearanceSpan? = null
-    private var textLayout: Layout? = null
-    private val spannableString = SpannableStringBuilder()
-    private var timer: CountDownTimer? = null
-    private var startDuration: Long = 0
-    private var currentDuration: Long = 0
-    private var timerRunning = false
-
-    private var listener: CountDownListener? = null
-
-    init {
-        init(attrs)
-    }
-
-    private fun init(attrs: AttributeSet) {
-        textPaint.color = Color.BLACK
-        val textSize: Int
-        val startDuration: Int
-        val textAppearanceRef: Int
-        val ta = context.obtainStyledAttributes(attrs, R.styleable.TimeCountView)
-        startDuration = ta.getInt(R.styleable.TimeCountView_startDuration, 0)
-        textSize = ta.getDimensionPixelSize(
-            R.styleable.TimeCountView_android_textSize,
-            dpToPx(12, resources).toInt()
-        )
-        textAppearanceRef = ta.getResourceId(R.styleable.TimeCountView_android_textAppearance, 0)
-        ta.recycle()
-        textPaint.textSize = textSize.toFloat()
-        if (textAppearanceRef != 0) {
-            textAppearanceSpan = TextAppearanceSpan(context, textAppearanceRef)
-            textPaint.textSize = textAppearanceSpan!!.textSize.toFloat()
+    var startTime: Long = SystemClock.elapsedRealtime()
+        set(value) {
+            if (!isRunning) {
+                field = value
+            }
         }
-        setStartDuration(startDuration.toLong())
-    }
+    var timeUnit: TimeUnit = TimeUnit.MILLISECONDS
+    var currentTime: Long = startTime
+        private set
 
-    fun setStartDuration(duration: Long) {
-        if (timerRunning) {
-            return
-        }
-        currentDuration = duration
-        startDuration = currentDuration
-        updateText(duration)
-    }
+    private lateinit var countType: CountType
+    private var isRunning: Boolean = false
 
-    fun start() {
-        if (timerRunning) {
-            return
+    private val stopwatchRunnable = object : Runnable {
+        override fun run() {
+            if (isRunning) {
+                currentTime += DateUtils.SECOND_IN_MILLIS
+                updateStopwatchTimeChunks()
+                updateScreen()
+
+                postDelayed(this, DateUtils.SECOND_IN_MILLIS)
+            }
         }
-        timerRunning = true
-        timer = object : CountDownTimer(currentDuration, 100) {
+    }
+    private val countDownTimer by lazy(LazyThreadSafetyMode.NONE) {
+        object : CountDownTimer(currentTime, DateUtils.SECOND_IN_MILLIS) {
             override fun onTick(millis: Long) {
-                currentDuration = millis
-                updateText(millis)
-                invalidate()
+                currentTime = millis
+                updateCountDownTimeChunks()
+                updateScreen()
             }
 
             override fun onFinish() {
                 stop()
-                listener?.onFinishCountDown()
+                countDownListener?.onFinishCountDown()
             }
         }
-        timer?.start()
     }
 
-    fun reset() {
-        stop()
-        setStartDuration(startDuration)
-        invalidate()
+
+    /**
+     * represents time as [ss, mm, hh, dd, yy, ...]
+     * where ss - seconds, mm - minutes, etc.
+     *
+     * thus, we can update values separately and identify which value has changed,
+     * so don't update other views
+     */
+    private lateinit var humanReadableTimeChunks: LongArray
+
+    private var countDownListener: CountDownListener? = null
+
+    init {
+        inflate(R.layout.view_time_block_container)
+        initAttributes(attrs)
     }
 
-    fun stop() {
-        if (!timerRunning) {
-            return
-        }
-        timerRunning = false
-        timer!!.cancel()
-    }
-
-    fun setListener(listener: CountDownListener?) {
-        this.listener = listener
-    }
-
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        if (textLayout == null) {
-            updateText(currentDuration)
-        }
-        setMeasuredDimension(textLayout!!.width, textLayout!!.height)
-    }
-
-    override fun onDraw(canvas: Canvas) {
-        super.onDraw(canvas)
-        textLayout!!.draw(canvas)
+    override fun onFinishInflate() {
+        super.onFinishInflate()
+        initializeScreen()
     }
 
     override fun onSaveInstanceState(): Parcelable? {
         val superState = super.onSaveInstanceState()
         val viewState = CountDownViewState(superState)
-        viewState.startDuration = startDuration
-        viewState.currentDuration = currentDuration
-        viewState.timerRunning = timerRunning
-        return viewState
+
+        return viewState.also {
+            it.startTime = startTime
+            it.currentTime = currentTime
+            it.timerRunning = isRunning
+        }
     }
 
     override fun onRestoreInstanceState(state: Parcelable) {
         val viewState: CountDownViewState = state as CountDownViewState
-        super.onRestoreInstanceState(viewState.getSuperState())
-        setStartDuration(viewState.startDuration)
-        currentDuration = viewState.currentDuration
+
+        super.onRestoreInstanceState(viewState.superState)
+
+        startTime = viewState.startTime
+        currentTime = viewState.currentTime
+
         if (viewState.timerRunning) {
-            start()
+            start(immediately = true)
         }
     }
 
-    fun updateText(duration: Long) {
-        val text = generateCountdownText(duration)
-        textLayout = createTextLayout(text)
-    }
+    fun start(immediately: Boolean) {
+        if (isRunning) return
 
-    fun createTextLayout(text: String): Layout {
-        val textWidth = textPaint.measureText(text).toInt()
-        val unitTextSize = (textPaint.textSize / 2).toInt()
-        spannableString.clear()
-        spannableString.clearSpans()
-        spannableString.append(text)
-        if (textAppearanceSpan != null) {
-            spannableString.setSpan(
-                textAppearanceSpan,
-                0,
-                text.length,
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-            )
-        }
-        val hrIndex = text.indexOf("h")
-        val minIndex = text.indexOf("m")
-        val secIndex = text.indexOf("s")
-        spannableString.setSpan(
-            AbsoluteSizeSpan(unitTextSize),
-            hrIndex,
-            hrIndex + 1,
-            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
-        spannableString.setSpan(
-            AbsoluteSizeSpan(unitTextSize),
-            minIndex,
-            minIndex + 1,
-            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
-        spannableString.setSpan(
-            AbsoluteSizeSpan(unitTextSize),
-            secIndex,
-            secIndex + 1,
-            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
-        return StaticLayout(
-            spannableString,
-            textPaint,
-            textWidth,
-            Layout.Alignment.ALIGN_CENTER,
-            0f,
-            0f,
-            true
-        )
-    }
+        isRunning = true
 
-    companion object {
-        private const val HOUR = 3600000
-        private const val MIN = 60000
-        private const val SEC = 1000
-        fun generateCountdownText(duration: Long): String {
-            val hr = (duration / HOUR).toInt()
-            val min =
-                ((duration - hr * HOUR) / MIN).toInt()
-            val sec =
-                ((duration - hr * HOUR - min * MIN) / SEC).toInt()
-            val locale = Locale.getDefault()
-            val format = "%02d"
-            val formattedHr = String.format(locale, format, hr)
-            val formattedMin = String.format(locale, format, min)
-            val formattedSec = String.format(locale, format, sec)
-            return String.format(
-                locale,
-                "%sh %sm %ss",
-                formattedHr,
-                formattedMin,
-                formattedSec
-            )
-        }
-
-        private fun dpToPx(dp: Int, resources: Resources): Float {
-            return TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP,
-                dp.toFloat(),
-                resources.displayMetrics
-            )
+        when (countType) {
+            CountType.STOPWATCH -> startStopwatch(immediately)
+            CountType.COUNTDOWN -> startCountDown()
         }
     }
+
+    fun reset() {
+        stop()
+        currentTime = startTime
+    }
+
+    fun stop() {
+        if (!isRunning) return
+
+        isRunning = false
+
+        when (countType) {
+            CountType.STOPWATCH -> stopStopwatch()
+            CountType.COUNTDOWN -> stopCountDown()
+        }
+    }
+
+    fun restart() {
+        when (countType) {
+            CountType.STOPWATCH -> restartStopwatch()
+            CountType.COUNTDOWN -> restartCountDown()
+        }
+    }
+
+    fun setListener(countDownListener: CountDownListener?) {
+        this.countDownListener = countDownListener
+    }
+
+    private fun initAttributes(attrs: AttributeSet?) {
+        context.obtainStyledAttributes(attrs, R.styleable.TimeCountView).use { typedArray ->
+            val startTime = typedArray.getInt(R.styleable.TimeCountView_start_time, Constant.NO_ID)
+                .takeUnless { it == Constant.NO_ID }
+                ?.toLong()
+
+            countType = typedArray.getIntOrThrow(R.styleable.TimeCountView_count_type).let { id ->
+                CountType.findById(id)
+            }
+
+            typedArray.getInt(R.styleable.TimeCountView_time_unit, Constant.NO_ID)
+                .takeUnless { it == Constant.NO_ID }
+                ?.let { value ->
+                    timeUnit = when (value) {
+                        0 -> TimeUnit.MILLISECONDS
+                        1 -> TimeUnit.SECONDS
+                        2 -> TimeUnit.MINUTES
+                        3 -> TimeUnit.HOURS
+                        else -> TimeUnit.DAYS
+                    }
+                }
+            typedArray.getBoolean(R.styleable.TimeCountView_start_immediately, false)
+                .let { startImmediately ->
+                    if (startImmediately && !isRunning) {
+                        if (countType == CountType.COUNTDOWN) {
+                            this.startTime = startTime ?: throw IllegalStateException(
+                                "start_time is required to start time immediately"
+                            )
+                            currentTime = timeUnit.toMillis(startTime)
+                        }
+
+                        start(immediately = false)
+                    }
+                }
+        }
+    }
+
+    private fun startStopwatch(immediately: Boolean) {
+        postDelayed(
+            stopwatchRunnable,
+            if (immediately) 0 else DateUtils.SECOND_IN_MILLIS
+        )
+    }
+
+    private fun stopStopwatch() {
+        removeCallbacks(stopwatchRunnable)
+    }
+
+    private fun startCountDown() {
+        countDownTimer.start()
+    }
+
+    private fun stopCountDown() {
+        countDownTimer.cancel()
+    }
+
+    private fun restartStopwatch() {
+        stop()
+        initializeScreen()
+
+        with(SystemClock.elapsedRealtime()) {
+            startTime = this
+            currentTime = this
+        }
+
+        start(immediately = false)
+    }
+
+    private fun restartCountDown() {
+        reset()
+        start(immediately = false)
+    }
+
+    private fun updateStopwatchTimeChunks() {
+        var millisPassed = currentTime - startTime
+
+        val days = TimeUnit.MILLISECONDS.toDays(millisPassed)
+        millisPassed -= TimeUnit.DAYS.toMillis(days)
+        val hours = TimeUnit.MILLISECONDS.toHours(millisPassed)
+        millisPassed -= TimeUnit.HOURS.toMillis(hours)
+        val minutes = TimeUnit.MILLISECONDS.toMinutes(millisPassed)
+        millisPassed -= TimeUnit.MINUTES.toMillis(minutes)
+        val seconds = TimeUnit.MILLISECONDS.toSeconds(millisPassed)
+
+        // the order matters
+        humanReadableTimeChunks = longArrayOf(
+            seconds, minutes, hours, days
+        )
+    }
+
+    private fun updateCountDownTimeChunks() {
+        var currentTimeInMillis = currentTime
+
+        val days = TimeUnit.MILLISECONDS.toDays(currentTimeInMillis)
+        currentTimeInMillis -= TimeUnit.DAYS.toMillis(days)
+        val hours = TimeUnit.MILLISECONDS.toHours(currentTimeInMillis)
+        currentTimeInMillis -= TimeUnit.HOURS.toMillis(hours)
+        val minutes = TimeUnit.MILLISECONDS.toMinutes(currentTimeInMillis)
+        currentTimeInMillis -= TimeUnit.MINUTES.toMillis(minutes)
+        val seconds = TimeUnit.MILLISECONDS.toSeconds(currentTimeInMillis)
+
+        // the order matters
+        humanReadableTimeChunks = longArrayOf(
+            seconds, minutes, hours, days
+        )
+    }
+
+    private fun initializeScreen() {
+        view_time_block_seconds.text = INITIAL_FIELD
+        view_time_block_minutes.text = INITIAL_FIELD
+        view_time_block_hours.text = INITIAL_FIELD
+        view_time_block_days.text =INITIAL_FIELD
+    }
+
+    private fun updateScreen() {
+        view_time_block_seconds.text = humanReadableTimeChunks[0].withLeadingZero()
+        view_time_block_minutes.text = humanReadableTimeChunks[1].withLeadingZero()
+        view_time_block_hours.text = humanReadableTimeChunks[2].withLeadingZero()
+        view_time_block_days.text = humanReadableTimeChunks[3].withLeadingZero()
+    }
+
+    private fun Long.withLeadingZero(): String = if (this < 10) "0$this" else toString()
 
     internal class CountDownViewState : BaseSavedState {
-        var startDuration: Long = 0
-        var currentDuration: Long = 0
+        var startTime: Long = 0
+        var currentTime: Long = 0
         var timerRunning = false
 
-        constructor(superState: Parcelable?) : super(superState) {}
+        constructor(superState: Parcelable?) : super(superState)
         constructor(source: Parcel) : super(source) {
-            startDuration = source.readLong()
-            currentDuration = source.readLong()
+            startTime = source.readLong()
+            currentTime = source.readLong()
             timerRunning = source.readInt() == 1
         }
 
         override fun writeToParcel(out: Parcel, flags: Int) {
             super.writeToParcel(out, flags)
-            out.writeLong(startDuration)
-            out.writeLong(currentDuration)
+            out.writeLong(startTime)
+            out.writeLong(currentTime)
             out.writeInt(if (timerRunning) 1 else 0)
         }
 
@@ -252,8 +299,22 @@ class TimeCountView @JvmOverloads constructor(
 
     }
 
+    private companion object {
+        const val INITIAL_FIELD = "00"
+    }
+
     interface CountDownListener {
         fun onFinishCountDown()
+    }
+
+    enum class CountType(val id: Int) {
+        STOPWATCH(0),
+        COUNTDOWN(1);
+
+        companion object {
+            fun findById(id: Int) = values().find { it.id == id } ?:
+                throw NoSuchElementException("CountType has not been found by id: $id")
+        }
     }
 
 }

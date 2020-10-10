@@ -2,9 +2,19 @@
 <resources>
 
     <declare-styleable name="TimeCountView">
-        <attr name="startDuration" format="integer"/>
-        <attr name="android:textSize"/>
-        <attr name="android:textAppearance"/>
+        <attr name="start_time" format="integer" />
+        <attr name="start_immediately" format="boolean" />
+        <attr name="time_unit" format="enum">
+            <enum name="milliseconds" value="0" />
+            <enum name="seconds" value="1" />
+            <enum name="minutes" value="2" />
+            <enum name="hours" value="3" />
+            <enum name="days" value="4" />
+        </attr>
+        <attr name="count_type" format="enum">
+            <enum name="stopwatch" value="0" />
+            <enum name="countdown" value="1" />
+        </attr>
     </declare-styleable>
 
 </resources>
