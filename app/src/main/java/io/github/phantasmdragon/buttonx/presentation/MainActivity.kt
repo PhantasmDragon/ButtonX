@@ -2,6 +2,7 @@ package io.github.phantasmdragon.buttonx.presentation
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.snackbar.Snackbar
 import io.github.phantasmdragon.buttonx.R
 import io.github.phantasmdragon.buttonx.data.SharedPreferences
 import io.github.phantasmdragon.buttonx.presentation.view.CheckerboardDrawable
@@ -32,6 +33,13 @@ class MainActivity : AppCompatActivity() {
     private fun attachListeners() {
         main_button_messed_up.setOnClickListener {
             onMessedUpClick()
+        }
+        main_message.setOnLongClickListener {
+            Snackbar.make(it, R.string.main_author, Snackbar.LENGTH_SHORT)
+                .setAnchorView(main_button_messed_up)
+                .show()
+
+            true
         }
     }
 

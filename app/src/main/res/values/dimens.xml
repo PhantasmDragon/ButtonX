@@ -14,6 +14,7 @@
 
     <!-- region Text -->
 
+    <dimen name="text_23sp">23sp</dimen>
     <dimen name="text_32sp">32sp</dimen>
     <dimen name="text_38sp">38sp</dimen>
 
