@@ -3,7 +3,7 @@
     <!-- Base application theme. -->
     <style name="ButtonX" parent="BaseTheme.NoActionBar.Translucent">
         <item name="colorPrimary">@color/purple_500</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorPrimaryVariant">#3B000000</item>
         <item name="colorOnPrimary">@color/white</item>
 
         <item name="colorSecondary">@color/teal_200</item>
@@ -18,7 +18,7 @@
     </style>
 
     <style name="BaseTheme.NoActionBar.Translucent">
-        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentStatus">false</item>
         <item name="android:windowTranslucentNavigation">true</item>
     </style>
 
