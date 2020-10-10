@@ -48,12 +48,12 @@
 
     <TextView
         android:id="@+id/main_message"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:background="@color/pink"
         android:text="@string/main_message"
-        android:textSize="20sp"
+        android:textSize="18sp"
         android:textColor="@color/white"
         android:typeface="monospace"
         app:layout_constraintStart_toStartOf="@id/main_guideline_start"

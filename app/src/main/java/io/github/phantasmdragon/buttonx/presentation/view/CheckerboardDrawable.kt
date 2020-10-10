@@ -12,7 +12,7 @@ class CheckerboardDrawable(context: Context) : Drawable() {
 
     private val size = 40
     private val colorOdd = context.getColorCompat(R.color.pink)
-    private val colorEven = context.getColorCompat(R.color.black)
+    private val colorEven = context.getColorCompat(R.color.dark_purple)
 
     init {
         configurePaint()
